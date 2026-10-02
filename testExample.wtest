@@ -1,9 +1,165 @@
-import example.pepita
+import example.* 
 
-describe "group of tests for pepita" {
+// Etapa 1 - Dependencias y Flotas
+describe "Tests de Dependencias y Flotas - Etapa 1" {
 
-  test "pepita has initial energy" {
-    assert.equals(100, pepita.energy())
+  // Dependencias
+  const deportes = new Dependencia(empleados = 45)
+  const cultura = new Dependencia(empleados = 31)
+
+  // Definir a cachito (compartido) y los autos de Deportes
+  const cachito = new ChevroletCorsa(color = "rojo")
+  const corsaAzul = new ChevroletCorsa(color = "azul")
+  const corsaVerde = new ChevroletCorsa(color = "verde")
+  const kwidDeportes = new RenaultKwid(tieneTanqueAdicional = true)
+  const especialDeportes = new AutoEspecial(
+    capacidad = 5,
+    velocidadMaxima = 150,
+    peso = 1200,
+    color = "beige"
+  )
+
+  // Autos de Cultura
+  const kwidCultura1 = new RenaultKwid(tieneTanqueAdicional = true)
+  const kwidCultura2 = new RenaultKwid(tieneTanqueAdicional = true)
+  const kwidCultura3 = new RenaultKwid(tieneTanqueAdicional = false)
+
+  method initialize() {
+    // Flota de Deportes
+    deportes.agregarAFlota(cachito)
+    deportes.agregarAFlota(corsaAzul)
+    deportes.agregarAFlota(corsaVerde)
+    deportes.agregarAFlota(kwidDeportes)
+    deportes.agregarAFlota(especialDeportes)
+
+    // Flota de Cultura
+    cultura.agregarAFlota(cachito)
+    cultura.agregarAFlota(kwidCultura1)
+    cultura.agregarAFlota(kwidCultura2)
+    cultura.agregarAFlota(kwidCultura3)
+
+    // Configurar la Trafic para Cultura
+    trafic.interior(interiorPopular)
+    trafic.motor(motorBataton)
+    cultura.agregarAFlota(trafic)
   }
 
+  test "Probamos la dependencia Deportes" {
+    assert.equals(6450, deportes.pesoTotalFlota())
+    assert.that(deportes.estaBienEquipada())
+    assert.equals(7, deportes.capacidadTotalEnColor("azul"))
+    assert.equals("rojo", deportes.colorDelRodadoMasRapido())
+    assert.that(deportes.esGrande())
+    assert.equals(25, deportes.capacidadFaltante())
+  }
+
+  test "Probamos la dependencia Cultura" {
+    assert.equals(10700, cultura.pesoTotalFlota())
+    assert.notThat(cultura.estaBienEquipada())
+    assert.equals(10, cultura.capacidadTotalEnColor("azul"))
+    assert.equals("rojo", cultura.colorDelRodadoMasRapido())
+    assert.notThat(cultura.esGrande())
+    assert.equals(5, cultura.capacidadFaltante())
+  }
+}
+
+// Etapa 2 - Pedidos de Traslado
+describe "Tests de la Etapa 2 - Pedidos de Traslado" {
+
+  const cachito = new ChevroletCorsa(color = "rojo")
+
+  const pedido1 = new Pedido(
+    distancia = 960,
+    tiempoMaximo = 8,
+    cantidadPasajeros = 4,
+    coloresIncompatibles = #{"azul", "negro"}
+  )
+
+  test "Cachito satisface el pedido inicial" {
+    assert.that(pedido1.puedeSatisfacer(cachito))
+  }
+
+  test "Si agregamos el rojo a los incompatibles, Cachito ya no puede satisfacerlo" {
+    pedido1.coloresIncompatibles().add("rojo")
+    assert.notThat(pedido1.puedeSatisfacer(cachito))
+  }
+
+  test "Si la cantidad de pasajeros es 6, Cachito no puede satisfacerlo" {
+    const pedido6Pasajeros = new Pedido(
+      distancia = 960,
+      tiempoMaximo = 8,
+      cantidadPasajeros = 6,
+      coloresIncompatibles = #{"azul", "negro"}
+    )
+    assert.notThat(pedido6Pasajeros.puedeSatisfacer(cachito))
+  }
+
+  test "Si aceleramos el pedido 2 veces (pasa a 6hs), la velocidad requerida sube a 160 y Cachito no llega" {
+    pedido1.acelerar() // Pasa a 7 hs
+    pedido1.acelerar() // Pasa a 6 hs
+    assert.notThat(pedido1.puedeSatisfacer(cachito))
+  }
+}
+
+// Etapa 3 - Registro de Pedidos en Dependencias
+describe "Tests de la Etapa 3 - Registro de Pedidos" {
+
+  const deportes = new Dependencia(empleados = 45)
+
+  // Autos de la flota de Deportes
+  const cachito = new ChevroletCorsa(color = "rojo")
+  const corsaAzul = new ChevroletCorsa(color = "azul")
+
+  // Pedidos para probar
+  const pedido1 = new Pedido(
+    distancia = 960,
+    tiempoMaximo = 8,
+    cantidadPasajeros = 4,
+    coloresIncompatibles = #{"azul", "negro"}
+  )
+
+  const pedido2 = new Pedido(
+    distancia = 500,
+    tiempoMaximo = 4,
+    cantidadPasajeros = 10, 
+    coloresIncompatibles = #{"azul", "rojo"}
+  )
+
+  const pedido3 = new Pedido(
+    distancia = 300,
+    tiempoMaximo = 3,
+    cantidadPasajeros = 2,
+    coloresIncompatibles = #{"azul"}
+  )
+
+  method initialize() {
+    deportes.agregarAFlota(cachito)
+    deportes.agregarAFlota(corsaAzul)
+
+    deportes.agregarPedido(pedido1)
+    deportes.agregarPedido(pedido2)
+    deportes.agregarPedido(pedido3)
+  }
+
+  test "Total de pasajeros en los pedidos" {
+    // 4 + 10 + 2 = 16
+    assert.equals(16, deportes.totalPasajerosEnPedidos())
+  }
+
+  test "Pedidos no satisfechos" {
+    // El pedido2 no puede ser satisfecho por ningún auto de la flota
+    assert.equals(#{pedido2}, deportes.pedidosNoSatisfechos().asSet())
+  }
+
+  test "El color azul es incompatible para todos los pedidos" {
+    assert.that(deportes.esIncompatibleParaTodos("azul"))
+    assert.notThat(deportes.esIncompatibleParaTodos("rojo"))
+  }
+
+  test "Relajar todos los pedidos aumenta su tiempo máximo en 1 hora" {
+    deportes.relajarTodosLosPedidos()
+    assert.equals(9, pedido1.tiempoMaximo())
+    assert.equals(5, pedido2.tiempoMaximo())
+    assert.equals(4, pedido3.tiempoMaximo())
+  }
 }
