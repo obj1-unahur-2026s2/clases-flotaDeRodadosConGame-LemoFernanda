@@ -1,18 +1,22 @@
 import wollok.game.*
+import example.*
 
-import example.pepita
-
-program PepitaGame {
-	game.title("Pepita")
+program mainExample {
+	game.title("Corsa en el Game")
 	game.height(10)
 	game.width(10)
 
-	// add assets in asset folder, for example, for the background
-  // game.boardGround("fondo2.jpg")
+	// Fondo de pantalla
+	game.boardGround("paredLadrillos1.jpg")
 
-	//
+	// Objeto auto
+	const auto1 = new ChevroletCorsa(color = "Rojo")
+	game.addVisualCharacter(auto1)
 
-	game.showAttributes(pepita) //Debug
+	// Controles para cambiar color
+	keyboard.r().onPressDo({ auto1.unColor("Rojo") })
+	keyboard.a().onPressDo({ auto1.unColor("Azul") })
+	keyboard.v().onPressDo({ auto1.unColor("Verde") })
 
 	game.start()
 }

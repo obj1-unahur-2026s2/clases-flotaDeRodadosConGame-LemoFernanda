@@ -1,6 +1,6 @@
 import wollok.game.*
+ 
  // etapa 1
-
 class ChevroletCorsa {
 
 var color
@@ -10,17 +10,33 @@ method color() = color
 method unColor(unColor) {
 
 color = unColor
-
 }
-
-
 method capacidad() = 4
 
 method velocidadMaxima() = 150
 
 method peso() = 1300
 
+// Etapa 4 - Wollok game
+var position = game.at(0, 0)
+const posicionesPasadas = [game.at(0,0)]
+
+method position() = position
+method position(nuevaPosicion) {
+position = nuevaPosicion
+posicionesPasadas.add(nuevaPosicion)
 }
+
+method image() = "autito" + color + ".png"
+
+// Recorrido
+  method pasoPor(posicion) = posicionesPasadas.contains(posicion)
+  method pasoPorFila(numero) = posicionesPasadas.any({ pos => pos.y() == numero })
+  method recorridoFilas(listaDeNumeros) = listaDeNumeros.all({ numero => self.pasoPorFila(numero) })
+
+}
+
+
 
 
 
