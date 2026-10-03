@@ -6,9 +6,8 @@ program mainExample {
 	game.height(10)
 	game.width(10)
 
-	// Fondo de pantalla
-	game.boardGround("paredLadrillos1.jpg")
-
+    /*
+     //Etapa 4
 	// Objeto auto
 	const auto1 = new ChevroletCorsa(color = "Rojo")
 	game.addVisualCharacter(auto1)
@@ -17,6 +16,45 @@ program mainExample {
 	keyboard.r().onPressDo({ auto1.unColor("Rojo") })
 	keyboard.a().onPressDo({ auto1.unColor("Azul") })
 	keyboard.v().onPressDo({ auto1.unColor("Verde") })
+	*/
 
-	game.start()
+// Etapa 5
+// Varios corsa en el game
+const corsa1 = new ChevroletCorsa(color = "Rojo", position = game.at(1,1))
+const corsa2 = new ChevroletCorsa(color = "Azul", position = game.at(3,1))
+const corsa3 = new ChevroletCorsa(color = "Verde", position = game.at(5,1))
+
+// Agregar los 3 corsa a la pantalla
+  game.addVisual(corsa1)
+  game.addVisual(corsa2)
+  game.addVisual(corsa3)
+
+  var autoActivo = corsa1
+
+  // Uso las teclas  1,2,3  para elegir auto
+  keyboard.num1().onPressDo({ autoActivo = corsa1 })
+  keyboard.num2().onPressDo({ autoActivo = corsa2 })
+  keyboard.num3().onPressDo({ autoActivo = corsa3 })
+
+  
+ // Controles de dirección
+  keyboard.up().onPressDo({ autoActivo.moverseHacia(norte) })
+  keyboard.down().onPressDo({ autoActivo.moverseHacia(sur) })
+  keyboard.left().onPressDo({ autoActivo.moverseHacia(oeste) })
+  keyboard.right().onPressDo({ autoActivo.moverseHacia(este) })
+
+  // Tecla para repetir el último movimiento (tecla espacio)
+  keyboard.space().onPressDo({ autoActivo.repetirUltimoMovimiento() })
+
+
+  // Cambiar color del auto activo
+  keyboard.r().onPressDo({ autoActivo.unColor("Rojo") })
+  keyboard.a().onPressDo({ autoActivo.unColor("Azul") })
+  keyboard.v().onPressDo({ autoActivo.unColor("Verde") })
+
+// Objeto Pared de la Etapa 5
+  const pared1 = new Pared(resistencia = 3, position = game.at(3, 3))
+  game.addVisual(pared1)
+
+  game.start()
 }

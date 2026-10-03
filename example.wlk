@@ -1,6 +1,6 @@
 import wollok.game.*
  
- // etapa 1
+ // Etapa 1
 class ChevroletCorsa {
 
 var color
@@ -34,8 +34,33 @@ method image() = "autito" + color + ".png"
   method pasoPorFila(numero) = posicionesPasadas.any({ pos => pos.y() == numero })
   method recorridoFilas(listaDeNumeros) = listaDeNumeros.all({ numero => self.pasoPorFila(numero) })
 
-}
+// Chocar antes de moverse
+method recibirImpacto() {
+    // No hace nada si un auto choca contra otro auto
+  }
 
+  method moverA(nuevaPosicion) {
+    const cosasEnCasillero = game.getObjectsIn(nuevaPosicion)
+    if (cosasEnCasillero.isEmpty()) {
+      self.position(nuevaPosicion)
+    } else {
+      cosasEnCasillero.forEach({ objeto => objeto.recibirImpacto() })
+    }
+  }
+
+  // Direcciones
+  var ultimaDireccion = norte // 
+
+  method moverseHacia(direccion) {
+    ultimaDireccion = direccion
+    const nuevaPos = direccion.siguientePosicion(self.position())
+    self.moverA(nuevaPos)
+  }
+
+  method repetirUltimoMovimiento() {
+    self.moverseHacia(ultimaDireccion)
+  }
+}
 
 
 
@@ -225,4 +250,40 @@ class Pedido {
     tiempoMaximo += 1
   }
 
+}
+// Etapa 5
+// Paredes
+class Pared {
+  var resistencia = 3
+  var position = game.at(3, 3)
+
+  method position() = position
+  method position(nuevaPosicion) { position = nuevaPosicion }
+
+  // Cambia la foto según la resistencia
+  method image() = "paredLadrillos" + resistencia + ".jpg"
+
+  // Cuando la chocan:
+  method recibirImpacto() {
+    resistencia = resistencia - 1
+    if (resistencia <= 0) {
+      game.removeVisual(self) // Desaparece si llega a 0
+    }
+  }
+}
+// Direcciones
+object norte {
+  method siguientePosicion(posicion) = posicion.up(1)
+}
+
+object sur {
+  method siguientePosicion(posicion) = posicion.down(1)
+}
+
+object este {
+  method siguientePosicion(posicion) = posicion.right(1)
+}
+
+object oeste {
+  method siguientePosicion(posicion) = posicion.left(1)
 }
